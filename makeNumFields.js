@@ -11,6 +11,7 @@ function getExistingData() {
 		ls_data = localStorage.getItem(LOCALSTORAGE_KEY);
 		if (ls_data == null) return;
 		ls_data = JSON.parse(ls_data);
+		return ls_data;
 	} catch (e) {
 		console.log("Could not get existing data:");
 		console.log(e);
@@ -20,11 +21,8 @@ function getExistingData() {
 function getLocalStorageValue(key) {
 	try {
 		data = getExistingData();
-		if (key in data) {
-			return data[key];
-		} else {
-			return 0;
-		}
+		if (data == null) return 0;
+		return data[key] || 0;
 	} catch (e) {
 		console.log(e);
 		return 0;

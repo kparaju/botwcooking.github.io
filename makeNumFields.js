@@ -20,6 +20,7 @@ function getValue(key) {
 }
 
 function setValue(k, v) {
+	// TODO: pull common code between getValue and setValue
 	try {
 		if (!hasLocalStorage()) return;
 		botwcooking = localStorage.getItem('botwcooking');

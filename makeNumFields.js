@@ -1,15 +1,27 @@
+DEFAULT_DATA = {"botwcooking:version": 1}
+LOCALSTORAGE_KEY = "botwcooking"
+
 function hasLocalStorage() {
 	return typeof localStorage === "object"
 }
 
-function getValue(key) {
+function getExistingData() {
 	try {
 		if (!hasLocalStorage()) return;
-		botwcooking = localStorage.getItem('botwcooking');
-		if (botwcooking == null) return 0;
-		botwcooking = JSON.parse(botwcooking);
-		if (key in botwcooking) {
-			return botwcooking[key];
+		ls_data = localStorage.getItem(LOCALSTORAGE_KEY);
+		if (ls_data == null) return;
+		ls_data = JSON.parse(ls_data);
+	} catch (e) {
+		console.log("Could not get existing data:");
+		console.log(e);
+	}
+}
+
+function getLocalStorageValue(key) {
+	try {
+		data = getExistingData();
+		if (key in data) {
+			return data[key];
 		} else {
 			return 0;
 		}
@@ -19,15 +31,12 @@ function getValue(key) {
 	}
 }
 
-function setValue(k, v) {
-	// TODO: pull common code between getValue and setValue
+function setLocalStorageValue(k, v) {
 	try {
-		if (!hasLocalStorage()) return;
-		botwcooking = localStorage.getItem('botwcooking');
-		botwcooking = JSON.parse(botwcooking);
-		if (botwcooking == null) botwcooking = {"botwcooking:version": 1};
-		botwcooking[k] = v;
-		localStorage.setItem('botwcooking', JSON.stringify(botwcooking));
+		data = getExistingData();
+		if (data == null) data = DEFAULT_DATA;
+		data[k] = v;
+		localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
 	} catch (e) {
 		console.log(e);
 	}
@@ -53,14 +62,14 @@ $(document).ready(function(){
 		}
 		$("#inputs" + column).append("<div class=\"row\" id=\"input" + i + "\">");
 		$("#input" + i).append("<p class=\"col-sm-6\">" + item.name + "</p>");
-		val = getValue(item.name);
+		val = getLocalStorageValue(item.name);
 		$("#input" + i).append("<input class=\"col-sm-6\" type=\"number\" min=\"0\" value=\"" + val + "\" data-name=\"" + item.name + "\" id=\"inputItem" + item.id + "\">")
 
 		// TODO: we are creating a lot of listeners. This is inefficient, we should only create one
 		$("#inputItem" + item.id).focusout(function(e) {
 			console.log(e.target.getAttribute("data-name"));
 			console.log(e.target.value);
-			setValue(e.target.getAttribute("data-name"), e.target.value)
+			setLocalStorageValue(e.target.getAttribute("data-name"), e.target.value)
 		});
 		//$("#inputs" + column).children().eq(0).append(item.name + "<br />");
 		//$("#inputs" + column).children().eq(1).append("<input type=\"number\" min=\"0\" value=\"2\" id=\"inputItem" + item.id + "\"><br />");
